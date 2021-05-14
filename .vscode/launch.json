@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--sub-broker-hostname",
+                "iotplatform.caps.in.tum.de",
+                "--sub-broker-port",
+                "1885",
+                "--sub-credentials-path",
+                "./secrets/sub-creds.json",
+                "--sub-topic-name",
+                "ROOM_EVENTS_TEST",
+                "--pub-broker-hostname",
+                "131.159.35.132",
+                "--pub-broker-port",
+                "1883",
+                "--pub-credentials-path",
+                "./secrets/device_110_key.json",
+                "--username",
+                "group4_2021_ss",
+            ]
+        }
+    ]
+}
