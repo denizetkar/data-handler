@@ -59,32 +59,25 @@ class SafeInt:
             return self
 
     def __add__(self, right_value: int) -> "SafeInt":
-        self += right_value
-        return self
+        return self.__iadd__(right_value)
 
     def __sub__(self, right_value: int) -> "SafeInt":
-        self -= right_value
-        return self
+        return self.__isub__(right_value)
 
     def __mul__(self, right_value: int) -> "SafeInt":
-        self *= right_value
-        return self
+        return self.__imul__(right_value)
 
     def __truediv__(self, right_value: int) -> float:
-        self /= right_value
-        return self
+        return self.__itruediv__(right_value)
 
     def __floordiv__(self, right_value: int) -> "SafeInt":
-        self //= right_value
-        return self
+        return self.__ifloordiv__(right_value)
 
     def __mod__(self, right_value: int) -> "SafeInt":
-        self %= right_value
-        return self
+        return self.__imod__(right_value)
 
     def __pow__(self, exponent: int, modulo: Optional[int] = None) -> "SafeInt":
-        self **= exponent % modulo
-        return self
+        return self.__ipow__(exponent, modulo)
 
     def __lt__(self, right_value: int) -> bool:
         with self._lock:
@@ -111,10 +104,13 @@ class SafeInt:
             return self._value >= right_value
 
     def __hash__(self) -> int:
-        return hash(self._value)
+        with self._lock:
+            return hash(self._value)
 
     def __str__(self) -> str:
-        return str(self._value)
+        with self._lock:
+            return str(self._value)
 
     def __repr__(self) -> str:
-        return repr(self._value)
+        with self._lock:
+            return repr(self._value)
