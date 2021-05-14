@@ -2,11 +2,29 @@ import time
 from typing import Any, Dict
 
 from mqtt import MQTTMessage, SafeClient
+from utils import SafeInt
 
 ENTER_MSG = "enter"
 EXIT_MSG = "leave"
-ROOM_COUNT = 0
+ROOM_COUNT = SafeInt(0)
 PAYLOAD_TEMPLATE = '{"username":"%s","%s":%d,"device_id":%d,"timestamp":%u}'
+
+
+def periodic_publisher_task(client: SafeClient, userdata: Dict[str, Any], period: int):
+    while True:
+        client.publish(
+            userdata["pub_topic_name"],
+            PAYLOAD_TEMPLATE
+            % (
+                userdata["username"],
+                "count",
+                ROOM_COUNT.value,
+                userdata["pub_credentials"]["device_id"],
+                time.time_ns() // 1e6,
+            ),
+            qos=1,
+        )
+        time.sleep(period)
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -31,12 +49,12 @@ def on_message(client: SafeClient, userdata: Dict[str, Any], mqtt_msg: MQTTMessa
     )
     pub_client: SafeClient = userdata["pub_client"]
     if msg == ENTER_MSG:
-        ROOM_COUNT += 1
+        ROOM_COUNT.increment()
     elif msg == EXIT_MSG:
-        ROOM_COUNT = max(0, ROOM_COUNT - 1)
+        ROOM_COUNT.decrement(0)
     pub_client.publish(
         userdata["pub_topic_name"],
         PAYLOAD_TEMPLATE
-        % (userdata["username"], "count", ROOM_COUNT, userdata["pub_credentials"]["device_id"], time.time_ns() // 1e6),
+        % (userdata["username"], "count", ROOM_COUNT.value, userdata["pub_credentials"]["device_id"], time.time_ns() // 1e6),
         qos=1,
     )

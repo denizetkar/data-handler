@@ -1,3 +1,4 @@
+import threading
 from typing import Any, Dict
 
 from mqtt import SafeClient
@@ -5,6 +6,7 @@ from mqtt import SafeClient
 from .publisher import on_connect as pub_on_connect
 from .subscriber import on_connect as sub_on_connect
 from .subscriber import on_message as sub_on_message
+from .subscriber import periodic_publisher_task
 
 
 class DataHandler:
@@ -48,7 +50,10 @@ class DataHandler:
         self._pub_client.username_pw_set("JWT", pub_credentials["token"])
         self._sub_client.connect(self._sub_broker_hostname, self._sub_broker_port)
         self._pub_client.connect(self._pub_broker_hostname, self._pub_broker_port)
+        # The thread that will send the count every 15 minutes
+        self._periodic_thread = threading.Thread(target=periodic_publisher_task, args=(self._pub_client, user_data, 15 * 60))
 
     def start(self):
+        self._periodic_thread.start()
         self._sub_client.loop_start()
         self._pub_client.loop_forever()

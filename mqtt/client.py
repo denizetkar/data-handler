@@ -15,6 +15,8 @@ class SafeClient(mqtt.Client):
         self._pub_sub_lock = threading.RLock()
 
     def publish(self, topic, payload=None, qos=0, retain=False, properties=None):
+        print("Would have published {} to topic {}".format(payload, topic))
+        return
         with self._pub_sub_lock:
             return super().publish(topic, payload=payload, qos=qos, retain=retain, properties=properties)
 
