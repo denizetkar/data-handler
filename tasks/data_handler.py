@@ -38,7 +38,7 @@ class DataHandler:
         self._sub_client.on_connect = sub_on_connect
         self._sub_client.on_message = sub_on_message
         self._pub_client.on_connect = pub_on_connect
-        self.user_data: Dict[str, Any] = {
+        self._user_data: Dict[str, Any] = {
             "sub_topic_name": self._sub_topic_name,
             "pub_topic_name": "{}_{}".format(self._pub_credentials["user_id"], self._pub_credentials["device_id"]),
             "sub_client": self._sub_client,
@@ -46,15 +46,15 @@ class DataHandler:
             "username": self._username,
             "pub_credentials": self._pub_credentials,
         }
-        self._sub_client.user_data_set(self.user_data)
-        self._pub_client.user_data_set(self.user_data)
+        self._sub_client.user_data_set(self._user_data)
+        self._pub_client.user_data_set(self._user_data)
         self._sub_client.username_pw_set(sub_credentials["username"], sub_credentials["password"])
         self._pub_client.username_pw_set("JWT", pub_credentials["token"])
         self._sub_client.connect(self._sub_broker_hostname, self._sub_broker_port)
         self._pub_client.connect(self._pub_broker_hostname, self._pub_broker_port)
         # The thread that will send the count every 15 minutes
         self._periodic_thread = threading.Thread(
-            target=periodic_publisher_task, args=(self._pub_client, self.user_data, 15 * 60)
+            target=periodic_publisher_task, args=(self._pub_client, self._user_data, 15 * 60)
         )
 
     def start(self):
@@ -62,13 +62,13 @@ class DataHandler:
         self._sub_client.loop_start()
         self._pub_client.loop_start()
         self._pub_client.publish(
-            self.userdata["pub_topic_name"],
+            self._user_data["pub_topic_name"],
             PAYLOAD_TEMPLATE
             % (
-                self.userdata["username"],
+                self._user_data["username"],
                 RESTART_SENSOR_NAME,
                 1,
-                self.userdata["pub_credentials"]["device_id"],
+                self._user_data["pub_credentials"]["device_id"],
                 time.time_ns() // 1e6,
             ),
             qos=1,
