@@ -54,6 +54,8 @@ def on_message(client: SafeClient, userdata: Dict[str, Any], mqtt_msg: MQTTMessa
         ROOM_COUNT.increment()
     elif msg == EXIT_MSG:
         ROOM_COUNT.decrement(0)
+    else:
+        return
     pub_client.publish(
         userdata["pub_topic_name"],
         PAYLOAD_TEMPLATE
