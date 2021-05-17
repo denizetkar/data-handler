@@ -19,7 +19,7 @@
                 "--sub-credentials-path",
                 "./secrets/sub-creds.json",
                 "--sub-topic-name",
-                "ROOM_EVENTS_TEST",
+                "ROOM_EVENTS",
                 "--pub-broker-hostname",
                 "131.159.35.132",
                 "--pub-broker-port",

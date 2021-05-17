@@ -8,6 +8,8 @@ ENTER_MSG = "enter"
 EXIT_MSG = "leave"
 ROOM_COUNT = SafeInt(0)
 PAYLOAD_TEMPLATE = '{"username":"%s","%s":%d,"device_id":%d,"timestamp":%u}'
+COUNT_SENSOR_NAME = "count"
+RESTART_SENSOR_NAME = "restart"
 
 
 def periodic_publisher_task(client: SafeClient, userdata: Dict[str, Any], period: int):
@@ -17,7 +19,7 @@ def periodic_publisher_task(client: SafeClient, userdata: Dict[str, Any], period
             PAYLOAD_TEMPLATE
             % (
                 userdata["username"],
-                "count",
+                COUNT_SENSOR_NAME,
                 ROOM_COUNT.value,
                 userdata["pub_credentials"]["device_id"],
                 time.time_ns() // 1e6,
@@ -55,6 +57,12 @@ def on_message(client: SafeClient, userdata: Dict[str, Any], mqtt_msg: MQTTMessa
     pub_client.publish(
         userdata["pub_topic_name"],
         PAYLOAD_TEMPLATE
-        % (userdata["username"], "count", ROOM_COUNT.value, userdata["pub_credentials"]["device_id"], time.time_ns() // 1e6),
+        % (
+            userdata["username"],
+            COUNT_SENSOR_NAME,
+            ROOM_COUNT.value,
+            userdata["pub_credentials"]["device_id"],
+            time.time_ns() // 1e6,
+        ),
         qos=1,
     )
